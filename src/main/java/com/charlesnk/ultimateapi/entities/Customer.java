@@ -1,8 +1,8 @@
 package com.charlesnk.ultimateapi.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Customer {
@@ -19,6 +19,12 @@ public class Customer {
 
     private String company;
 
+    //Pour éviter la suppression en cascade on a retiré CascadeType.REMOVE
+    //On a pas aussi fait le mappedBy="Invoice" parceque c'est fait automatiquement
+    //On peut faire fetch=FetchType.EAGER
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    private List<Invoice> invoices;
+
     public Customer() {
     }
 
@@ -28,6 +34,15 @@ public class Customer {
         this.lastName = lastName;
         this.email = email;
         this.company = company;
+    }
+
+    public Customer(int id, String firstName, String lastName, String email, String company, List<Invoice> invoices) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.company = company;
+        this.invoices = invoices;
     }
 
     public int getId() {
@@ -68,5 +83,23 @@ public class Customer {
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
+    }
+
+    public void addInvoices(Invoice tempInvoice) {
+
+        if (invoices == null) {
+            invoices = new ArrayList<>();
+        }
+
+        invoices.add(tempInvoice);
+        tempInvoice.setCustomer(this);
     }
 }
